@@ -8,6 +8,10 @@
 <canvas id="canvas" style="border:1px solid #000"></canvas>
  
 <script>
+var GAME_STATE_LOSE = 0;
+var GAME_STATE_WIN = 1;
+var GAME_STATE_STARTED = 2;
+
 (function () {
     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
     window.requestAnimationFrame = requestAnimationFrame;
@@ -28,9 +32,21 @@ var canvas = document.getElementById("canvas"),
         jumping: false,
         grounded: false
     },
+    princess = {
+        x: 140,
+        y: 5,
+        width: 5,
+        height: 5,
+        speed: 3,
+        velX: 0,
+        velY: 0,
+        jumping: false,
+        grounded: false
+    },
     keys = [],
     friction = 0.8,
-    gravity = 0.3;
+    gravity = 0.3,
+    gamestate = GAME_STATE_STARTED;
  
 var boxes = [];
  
@@ -44,9 +60,23 @@ boxes.push({
 boxes.push({
     x: 0,
     y: height - 2,
-    width: width,
+    width: width/5,
     height: 50
 });
+boxes.push({
+    x: width/3,
+    y: height - 2,
+    width: width/5,
+    height: 50
+});
+
+boxes.push({
+    x: width/3 + width/5 + 10,
+    y: height - 2,
+    width: width/5,
+    height: 50
+});
+
 boxes.push({
     x: width - 10,
     y: 0,
@@ -83,6 +113,27 @@ canvas.width = width;
 canvas.height = height;
  
 function update() {
+	if (gamestate == GAME_STATE_WIN) {
+		ctx.fill();
+		ctx.fillStyle = "yellow";
+		ctx.fillRect(0,0,width,height);
+
+		ctx.fillStyle = "blue";
+		ctx.font = "bold 16px Arial";
+		ctx.fillText("YOU WIN!", 100, 100);
+		return;
+	}
+
+	if (gamestate == GAME_STATE_LOSE) {
+		ctx.fill();
+		ctx.fillStyle = "red";
+		ctx.fillRect(0,0,width,height);
+		ctx.fillStyle = "white";
+		ctx.font = "bold 16px Arial";
+		ctx.fillText("SORRY YOU LOSE!", 100, 100);
+		return;
+	}
+
     // check keys
     if (keys[38] || keys[32]) {
         // up arrow or space
@@ -127,7 +178,16 @@ function update() {
         } else if (dir === "t") {
             player.velY *= -1;
         }
- 
+    }
+    ctx.fill();
+
+	// princess
+	ctx.fillStyle = "blue";
+    ctx.beginPath();
+    ctx.rect(princess.x, princess.y, princess.width, princess.height);
+    var princessdir = colCheck(player, princess);
+    if (princessdir !== null) {
+        gamestate = GAME_STATE_WIN;
     }
  
     if(player.grounded){
@@ -137,10 +197,14 @@ function update() {
     player.x += player.velX;
     player.y += player.velY;
  
+    // player 1
     ctx.fill();
     ctx.fillStyle = "red";
     ctx.fillRect(player.x, player.y, player.width, player.height);
- 
+
+    if (player.y >= height+5) {
+    	gamestate = GAME_STATE_LOSE;
+    }
     requestAnimationFrame(update);
 }
  
