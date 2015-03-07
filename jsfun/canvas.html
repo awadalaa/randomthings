@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+    <title>My fancy game</title>
+</head>
+<body>
+ 
+<canvas id="canvas" style="border:1px solid #000"></canvas>
+ 
+<script>
+var c = document.createElement("canvas");
+document.body.appendChild(c);
+var ctx = c.getContext("2d");
+ctx.rect(20, 20, 150, 100);
+ctx.fillText('hover mouse here', 60, 60);
+
+c.addEventListener('mouseover', function() {
+    ctx.stroke();
+});
+
+</script>
+</body>
+</html>

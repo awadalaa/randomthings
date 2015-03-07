@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <title>Event Hub</title>
+    <script src="pubsub.js"></script>
+    <script>
+      var subscription = pubsub.subscribe('/go', function(params) {
+        console.log('one', params);
+      });
+      var subscription2 = pubsub.subscribe('/go', function(params) {
+        console.log('two', params);
+      });
+      pubsub.subscribe('/extra', function(params) {
+        console.log('extra', params);
+      });
+    </script>
+  </head>
+  <body>
+    <button id="go">go</button>
+    <button id="unsubscribe1">unsubscribe 1</button>
+    <button id="unsubscribe2">unsubscribe 2</button>
+    <script>
+      var d = document;
+      d.getElementById('go').addEventListener('click', function(event) {
+        pubsub.publish('/go', event.timeStamp);
+      });
+      d.getElementById('unsubscribe1').addEventListener('click', function() {
+        console.log('unsubscribe 1');
+        subscription.remove();
+      });
+      d.getElementById('unsubscribe2').addEventListener('click', function() {
+        console.log('unsubscribe 2');
+        subscription2.remove();
+      });
+    </script>
+  </body>
+</html>
